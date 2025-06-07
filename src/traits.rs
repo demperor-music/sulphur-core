@@ -1,7 +1,7 @@
-use std::ffi::{OsStr, OsString};
+use std::ffi::OsStr;
 use std::fs;
-use std::io::{Error, Read, Write};
-use std::path::{Path, PathBuf};
+use std::io::{Read, Write};
+use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};

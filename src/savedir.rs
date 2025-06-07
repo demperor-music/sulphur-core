@@ -1,4 +1,3 @@
-use std::fs;
 use std::io::Error;
 use std::path::PathBuf;
 use crate::{SaveableDefaultPath, SulphurConfig};

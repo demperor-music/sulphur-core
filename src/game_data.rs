@@ -5,7 +5,7 @@ use std::ffi::OsString;
 
 use crate::{SaveableDefaultPath, SulphurConfig};
 use crate::asset::{Iwad, Mod};
-use crate::utils::{get_arguments, get_enabled};
+use crate::utils::get_arguments;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GameData {
