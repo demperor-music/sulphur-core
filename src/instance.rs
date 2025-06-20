@@ -37,6 +37,7 @@ impl Instance {
         self.metadata.last_played = Some(time::SystemTime::now());
 
         {
+            // ↓ this really does nothing rn, but it'll turn useful as soon as xdg starts supporting windows
             #[cfg(target_family = "windows")]
             {
                 let mut cmd = Command::new("cmd");
@@ -72,7 +73,7 @@ impl Instance {
             zip.add_directory(dirname, FileOptions::default())?;
         }
 
-        new_instance.initialize_savedir()?;
+        new_instance.initialize_relative_savedir()?;
         if transfer_saves {
             let saves_dir = self.gamedata.savedir.clone();
             let new_saves_dir = new_instance.gamedata.get_savedir().to_string_lossy();
@@ -85,13 +86,13 @@ impl Instance {
                 let dest_path = format!("{}/{}", &new_saves_dir, filename);
                 zip.start_file(&dest_path, FileOptions::default())?;
                 let mut buffer = Vec::new();
-                fs::File::open(&path)?.read_to_end(&mut buffer)?;
+                File::open(&path)?.read_to_end(&mut buffer)?;
                 zip.write_all(&buffer)?;
             }
         }
 
         if !transfer_playtime {
-            new_instance.metadata.playtime = std::time::Duration::new(0, 0);
+            new_instance.metadata.playtime = time::Duration::new(0, 0);
             new_instance.metadata.last_played = None;
             new_instance.metadata.last_session_duration = None;
         }
@@ -139,7 +140,7 @@ impl Instance {
                         let mut dest_file = File::create(&dest_path)?;
                         let mut buffer = Vec::new();
                         file.read_to_end(&mut buffer)?;
-                        std::io::Write::write_all(&mut dest_file, &buffer)?;
+                        Write::write_all(&mut dest_file, &buffer)?;
                     } else {
                         println!("{} found in Sulphur directory, skipping...", &dest_path.display());
                     }
@@ -165,9 +166,17 @@ impl Instance {
         fs::create_dir_all(self.gamedata.savedir.clone())
     }
 
-    pub fn initialize_savedir(&mut self) -> Result<()> {
+    pub fn initialize_relative_savedir(&mut self) -> Result<()> {
         let instance_save_dir = format!("{}/{}", Savedir::get_dir_name(), &self.metadata.name);
         self.gamedata.savedir = PathBuf::from(instance_save_dir);
+        Ok(())
+    }
+
+    pub fn initialize_absolute_savedir(&mut self) -> Result<()> {
+        self.initialize_relative_savedir()?;
+        if let Some(absolute_savedir) = self.gamedata.get_absolute_savedir() {
+            self.gamedata.savedir = absolute_savedir;
+        }
         Ok(())
     }
 }

@@ -1,5 +1,5 @@
 use std::io::Error;
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 use crate::{SaveableDefaultPath, SulphurConfig};
 
 pub struct Savedir;
@@ -11,6 +11,6 @@ impl Savedir {
     pub fn get() -> Result<PathBuf, Error> {
         SulphurConfig::get_dir()
             .place_data_file(Savedir::get_dir_name())
-            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))
+            .map_err(|e| Error::new(std::io::ErrorKind::Other, e))
     }
 }
